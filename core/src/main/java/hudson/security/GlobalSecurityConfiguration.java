@@ -173,5 +173,43 @@ public class GlobalSecurityConfiguration extends ManagementLink implements Descr
         public String getDisplayName() {
             return Messages.GlobalSecurityConfiguration_DisplayName();
         }
+        
+        public void doSave(final StaplerRequest request, final StaplerResponse response) throws IOException, ServletException {
+            String realm = "";
+            String authorization = "";
+            boolean realmNotSet = false;
+            boolean authNotSet = false;
+            
+            try{
+                JSONObject formData = request.getSubmittedForm();
+                realm = formData.getString("realm");
+                authorization = formData.getString("authorization");
+                
+            } catch (IOException exception) {
+                LOGGER.log(Level.SEVERE, "Can't save the form data: " + request, exception);
+            }
+            catch (JSONException exception) {
+                LOGGER.log(Level.SEVERE, "Can't parse the form data: " + request, exception);
+            }
+            catch (IllegalArgumentException exception) {
+                LOGGER.log(Level.SEVERE, "Can't parse the form data: " + request, exception);
+            }
+            catch (ServletException exception) {
+                LOGGER.log(Level.SEVERE, "Can't process the form data: " + request, exception);
+            }
+            
+            realmNotSet = realm.isEmpty();
+            authNotSet = authorization.isEmpty();
+            
+            if(! (realmNotSet && authNotSet)){
+        	LOGGER.log("Security settings saved!");
+        	return;
+            }else if(realmNotSet && !authNotSet){
+        	LOGGER.log(Level.SEVERE, "No security realm is set. Configuration can't be saved" + request, exception);
+            }else if(!realmNotSet && authNotSet){
+        	LOGGER.log(Level.SEVERE, "No authorization strategy is set. Configuration can't be saved" + request, exception);
+            }
+        }
+      
     }
 }
