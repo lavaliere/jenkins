@@ -24,6 +24,7 @@
 package hudson.security;
 
 import com.google.common.base.Predicate;
+
 import hudson.BulkChange;
 import hudson.Extension;
 import hudson.Functions;
@@ -43,6 +44,7 @@ import javax.servlet.ServletException;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import jenkins.util.ServerTcpPort;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 import org.kohsuke.stapler.StaplerRequest;
@@ -185,8 +187,6 @@ public class GlobalSecurityConfiguration extends ManagementLink implements Descr
                 realm = formData.getString("realm");
                 authorization = formData.getString("authorization");
                 
-            } catch (IOException exception) {
-                LOGGER.log(Level.SEVERE, "Can't save the form data: " + request, exception);
             }
             catch (JSONException exception) {
                 LOGGER.log(Level.SEVERE, "Can't parse the form data: " + request, exception);
@@ -202,12 +202,12 @@ public class GlobalSecurityConfiguration extends ManagementLink implements Descr
             authNotSet = authorization.isEmpty();
             
             if(! (realmNotSet && authNotSet)){
-        	LOGGER.log("Security settings saved!");
+        	LOGGER.log(Level.INFO, "Security settings saved!");
         	return;
             }else if(realmNotSet && !authNotSet){
-        	LOGGER.log(Level.SEVERE, "No security realm is set. Configuration can't be saved" + request, exception);
+        	LOGGER.log(Level.SEVERE, "No security realm is set. Configuration can't be saved");
             }else if(!realmNotSet && authNotSet){
-        	LOGGER.log(Level.SEVERE, "No authorization strategy is set. Configuration can't be saved" + request, exception);
+        	LOGGER.log(Level.SEVERE, "No authorization strategy is set. Configuration can't be saved");
             }
         }
       
